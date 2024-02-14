@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 
 const TicketForm = () => {
+  const router = useRouter()
   const handleChange = (e) => {
     const value = e.target.value;
     const name = e.target.name;
@@ -14,8 +15,21 @@ const TicketForm = () => {
     }));
   };
 
-  const handleSubmit = () => {
-    console.log("submitted");
+  const handleSubmit = async(e) => {
+    preventDefault();
+    const res = await fetch("/api/Tickets",{
+      method: "POST",
+      body: JSON.stringify({formData}),
+      "content-type": "application/json"
+
+    })
+
+    if(!res.ok){
+      throw new Error("Failed to create Ticket")
+    }
+
+    router.refresh();
+    router.push("/");
   };
 
   const startingTicketData = {
@@ -99,7 +113,40 @@ const TicketForm = () => {
             checked={formData.priority == 3}
           />
           <label htmlFor="">3</label>
-        </div>
+
+          <input
+            id="priority-4"
+            name="priority"
+            type="radio"
+            onChange={handleChange}
+            value={4}
+            checked={formData.priority == 4}
+          />
+          <label htmlFor="">4</label>
+
+          <input
+            id="priority-5"
+            name="priority"
+            type="radio"
+            onChange={handleChange}
+            value={5}
+            checked={formData.priority == 5}
+          />
+          <label htmlFor="">5</label>
+          </div>
+
+          <label htmlFor="">Progress</label>
+          <input type="range" id="progress" name="progress" value={formData.progress} min={0} max={100} onChange={handleChange} step={5} />
+
+          <label htmlFor="">Status</label>
+          <select name="status" id="status" value={formData.status} onChange={handleChange}>
+            <option value="not started">Not started</option>
+            <option value="started">Started</option>
+            <option value="done">Done</option>
+          </select>
+          <input type="submit" className="btn max-w-full"  value={"Create ticket"}/>
+
+        
       </form>
     </div>
   );
